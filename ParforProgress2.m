@@ -30,6 +30,7 @@ classdef ParforProgress2 < handle
     properties (GetAccess = private, SetAccess = private)
         Port
         HostName
+        ISA
         DEBUG = false;
     end
     
@@ -56,6 +57,7 @@ classdef ParforProgress2 < handle
                 % "Private" constructor used for the clients
                 o.HostName = s{1};
                 o.Port     = s{2};
+                o.initISA();
                 o.DEBUG    = s{3};
              
             % Initialize server
@@ -87,12 +89,18 @@ classdef ParforProgress2 < handle
                 
                 address = java.net.InetAddress.getLocalHost;
                 o.HostName = char(address.getHostAddress);
-
+                
+                o.initISA();
+                
                 o.DEBUG = do_debug;
 
             else
                 error( 'Public constructor is: ParforProgress2(''Text'', N, percentage, do_debug, use_gui)' );
             end
+        end
+
+        function initISA(o)
+            o.ISA = java.net.InetSocketAddress(o.HostName, o.Port);
         end
         
         % Keep port, hostname, matlab version and debug flag
@@ -105,8 +113,9 @@ classdef ParforProgress2 < handle
         function increment(o, i) %#ok<INUSD>
             % i is a fake input so we stay compatible with
             % "ParforProgressConsole2.m"
-            s = java.net.Socket(o.HostName, o.Port);
+            s = java.net.Socket();
             s.setReuseAddress(true); % Maybe this helps with ultra short connection times?
+            s.connect(o.ISA);
             s.close();
         end
         
