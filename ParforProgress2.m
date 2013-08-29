@@ -30,36 +30,35 @@ classdef ParforProgress2 < handle
     properties (GetAccess = private, SetAccess = private)
         Port
         HostName
-        OldVersion = 0;
-        DEBUG = 0;
+        DEBUG = false;
     end
     
     properties (Transient, GetAccess = private, SetAccess = private)
         JavaBit
     end
     
-    methods (Static)
-        function o = loadobj(X)
-        % Once we've been loaded, we need to reconstruct ourselves
-        % correctly as a client
-            o = ParforProgress2( {X.HostName, X.Port, X.OldVersion, X.DEBUG} );
-            % disp('loading');
+    methods ( Static )
+        function o = loadobj( X )
+        % Once we've been loaded, we need to reconstruct ourselves correctly as 
+        % a worker-side object.
+            o = ParforProgress2( {X.HostName, X.Port, X.DEBUG} );
         end
     end
-    
+
     methods
         function o = ParforProgress2(s, n, percentage, do_debug, use_gui)
         % ParforProgress Build a Parfor Progress Monitor
         % Use the syntax: ParforProgress( 'Window Title', N, percentage, do_debug, use_gui )
         % where N is the number of iterations in the PARFOR loop
         
-            % initalize client
+            % Initalize client
             if nargin == 1 && iscell(s)
                 % "Private" constructor used for the clients
-                o.JavaBit   = ParforProgressClient2.createClient(s{1}, s{2}, s{4});
-                o.Port      = [];
+                o.HostName = s{1};
+                o.Port     = s{2};
+                o.DEBUG    = s{3};
              
-            % initialize server
+            % Initialize server
             elseif (nargin == 5 || nargin == 4 || nargin == 3 || nargin == 2)
                 
                 if nargin < 5
@@ -74,11 +73,6 @@ classdef ParforProgress2 < handle
                     percentage = 0.1;
                 end
                 
-                % check for old matlab versions.
-                if get_matlab_version < 7.07
-                    o.OldVersion = 1;
-                end
-
                 o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage, use_gui);
                 o.Port      = double(o.JavaBit.getPort());
                 
@@ -95,40 +89,30 @@ classdef ParforProgress2 < handle
                 o.HostName = char(address.getHostAddress);
 
                 o.DEBUG = do_debug;
-                
+
             else
                 error( 'Public constructor is: ParforProgress2(''Text'', N, percentage, do_debug, use_gui)' );
             end
         end
         
+        % Keep port, hostname, matlab version and debug flag
         function X = saveobj(o)
-        % keep port, hostname, matlab version and debug flag
             X.Port     = o.Port;
             X.HostName = o.HostName;
-            X.OldVersion = o.OldVersion;
-            X.DEBUG = o.DEBUG;
-            % disp('saving');
+            X.DEBUG    = o.DEBUG;
         end
         
         function increment(o, i) %#ok<INUSD>
-        % i is a fake input so we stay compatible with
-        % "ParforProgressConsole2.m"
-        
-            % Something is wrong with matlab 2008a and the saveobj /
-            % loadobj methods. There is no 'JavaBit' in the 'o' if you
-            % have matlabpool enabled.
-            if o.OldVersion == 0
-                o.JavaBit.increment();
-            end
-            
+            % i is a fake input so we stay compatible with
+            % "ParforProgressConsole2.m"
+            s = java.net.Socket(o.HostName, o.Port);
+            s.setReuseAddress(true); % Maybe this helps with ultra short connection times?
+            s.close();
         end
         
-        function delete(o)
         % Close the UI
-            % somethings wrong with matlab 2008a and the saveobj /
-            % loadobj methods. there is no 'JavaBit' in the 'o' if you
-            % have matlabpool enabled.
-            if o.OldVersion == 0
+        function delete(o)
+            if ~isempty(o.JavaBit)
                 o.JavaBit.done();
             end
         end

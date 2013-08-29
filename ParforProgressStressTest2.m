@@ -10,7 +10,7 @@ function ParforProgressStressTest2(N)
         N = 10000;
     end
     
-    do_debug = 1;
+    do_debug = true;
     
     %% initialize ParforProgress monitor
     
