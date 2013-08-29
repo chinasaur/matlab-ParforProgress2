@@ -87,8 +87,8 @@ classdef ParforProgress2 < handle
                 % not be connect to network (will have local IP only).
                 %o.HostName = gethostname();
                 
-                address = java.net.InetAddress.getLocalHost;
-                o.HostName = char(address.getHostAddress);
+                address = java.net.InetAddress.getLocalHost();
+                o.HostName = char(address.getHostAddress());
                 
                 o.initISA();
                 
