@@ -18,7 +18,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 %           % this should NEVER EVER happen.
 %           msg{1} = 'Unknown error while initializing "ParforProgressStarter2":';
 %           msg{2} = me.message;
-%           print_error_red(msg);
+%           disp(msg);
 %           % backup solution so that we can still continue.
 %           ppm.increment = nan(1, nbr_files);
 %       end
