@@ -60,7 +60,6 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 	private boolean USE_GUI = true;
 	private int counter;
 	private int DEBUG = 0;
-	private AtomicBoolean show_execution_time_executed;
 	private AtomicBoolean stop_program_executed;
 	private Console console;
     
@@ -71,10 +70,6 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
 	private Timer gui_timer; // the timer updating the run time
 	
-	public synchronized int CountUp(){
-		return counter++;
-	}
-    
 	private boolean started_from_console = false;
     
 	public synchronized boolean set_started_from_console() {
@@ -362,7 +357,6 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
             gui_timer.start();
         }
         
-        show_execution_time_executed = new AtomicBoolean(false);
         stop_program_executed = new AtomicBoolean(false);
         
         // initialize console output
@@ -437,20 +431,11 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
     // called from matlab's delete()
     public void done() {
-        // System.out.println("called done()");
-        show_execution_time();
         stop_program();
     }
     
     // called from within our updateGUI() function
     public void done_from_GUI() {
-        // make sure we don't show the execution time twice. only show it 
-        // here, if this program is running on the console (so no-one will 
-        // call done() anymore.
-        if (get_started_from_console() == true) {
-            show_execution_time();
-        }
-        // System.out.println("called done_from_GUI()");        
         stop_program();
     }
     
@@ -458,7 +443,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     public void stop_program() {
         if (stop_program_executed.get() == false) {
 
-			// stop all timers & threads
+			      // stop all timers & threads
             stop_program_executed.set(true);
             listening = false;
             if (USE_GUI == true) {
@@ -475,19 +460,6 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
             
         }
     }
-    
-    public void show_execution_time() {
-        if (show_execution_time_executed.get() == false) {
-            
-            show_execution_time_executed.set(true);
-            
-            System.out.flush();
-            System.err.println("\n" + "  >> execution time was " + CurrentRuntime(2) + ".\n");
-            System.err.flush();
-            
-        }
-    }
-
     
     public void update_runtime() {
     // this function is called periodically by 'gui_timer'
@@ -523,10 +495,11 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         if (DEBUG == 2)
             System.out.println("Calling server increment");
 
-        CountUp();
+        synchronized(this) {
+            counter++;
+        }
         updateGUI();
     }
-    
     
 }
 
