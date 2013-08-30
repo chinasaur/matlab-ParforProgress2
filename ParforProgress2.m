@@ -89,7 +89,6 @@ classdef ParforProgress2 < handle
                 
                 address = java.net.InetAddress.getLocalHost();
                 o.HostName = char(address.getHostAddress());
-                
                 o.initISA();
                 
                 o.DEBUG = do_debug;
@@ -114,7 +113,6 @@ classdef ParforProgress2 < handle
             % i is a fake input so we stay compatible with
             % "ParforProgressConsole2.m"
             s = java.net.Socket();
-            s.setReuseAddress(true); % Maybe this helps with ultra short connection times?
             s.connect(o.ISA);
             s.close();
         end
