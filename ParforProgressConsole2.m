@@ -4,6 +4,7 @@ classdef ParforProgressConsole2 < handle
 % not using saveobj and loadobj, because old matlab versions have problems
 % with it.
 % Copyright (c) 2010-2012, Andreas Kotowicz
+% Modified AUG-2013, Peter H. Li
 
     properties (GetAccess = private, SetAccess = private)
         message

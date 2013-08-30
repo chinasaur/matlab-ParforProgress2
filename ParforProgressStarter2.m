@@ -36,6 +36,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 %
 % 
 % Copyright (c) 2010-2013, Andreas Kotowicz
+% Modified AUG-2013, Peter H. Li
 %
     %%
 

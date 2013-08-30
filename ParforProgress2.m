@@ -24,6 +24,7 @@
 %
 %
 % Copyright (c) 2010-2012, Andreas Kotowicz
+% Modified AUG-2013, Peter H. Li
 
 classdef ParforProgress2 < handle
 

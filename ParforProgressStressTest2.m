@@ -4,6 +4,7 @@ function ParforProgressStressTest2(N)
 % computer can handle, and adjust the ppm.increment() call accordingly.
 %
 % Copyright (c) 2010-2013, Andreas Kotowicz
+% Modified AUG-2013, Peter H. Li
 %
 %%
     if nargin < 1
